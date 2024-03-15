@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+
+<h1>Notes:</h1>
+{% for note in notes %}
+<b>{{ note.title }}</b> - <small>{{ note.number }}</small>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" value="{{ note.id }}" name="delete">
+    <button type="submit">Delete</button>
+</form>
+<br>
+{% endfor %}
+
+{% endblock %}
