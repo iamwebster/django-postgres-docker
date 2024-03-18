@@ -8,6 +8,8 @@
     {{ form.as_p }}
     <button type="submit">Submit</button>
 </form>
+<br>
+<a href="{% url 'celery_page' %}">Go to Celery</a>
 
 <h1>Notes:</h1>
 {% for note in notes %}

@@ -5,14 +5,16 @@ services:
     build:
       context: .
     container_name: web 
+    restart: always
     ports:
       - "8000:8000"
     volumes:
-      - ./dj_data:/dj_data
+      - .:/usr/src/app/app_data
     env_file:
       - .env
     depends_on:
       - postgres
+      - redis
   
   postgres:
     image: postgres:16.2
@@ -20,10 +22,38 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./pg_data:/var/lib/postgresql/data
+      - /usr/src/postgres_data:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  
+  redis:
+    image: redis:7.2.4-alpine
+    restart: always
+    container_name: redis
+
+  worker:
+    build:
+      context: .
+    restart: always
+    container_name: worker
+    entrypoint: celery
+    command: -A test_project worker --loglevel=info
+    depends_on:
+      - redis
+
+  flower:
+    build:
+      context: .
+    entrypoint: celery
+    command: -A test_project flower 
+    container_name: flower
+    volumes:
+      - /usr/src/flower_data:/usr/src/flower_data
+    depends_on:
+      - redis
+    ports:
+      - "5555:5555"

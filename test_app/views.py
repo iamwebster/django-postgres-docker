@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.views import View 
 from .models import TestModel
 from .forms import TestForm
+from . import tasks 
 
 
 class TestView(View):
@@ -19,4 +20,10 @@ class TestView(View):
         if form.is_valid():
             form.save()
             return redirect('home')
+        
+
+class TestCeleryView(View):
+    def get(self, request):
+        tasks.check_celery.delay()
+        return render(request, 'celery_page.html')
         
